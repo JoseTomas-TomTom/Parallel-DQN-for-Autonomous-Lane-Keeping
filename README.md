@@ -10,4 +10,5 @@ penalizes lane deviation, heading error, and aggressive steering.
 ```bash
 pip install gymnasium==0.29.1 stable-baselines3==2.3.2 matplotlib numpy
 
+python main.py
 
