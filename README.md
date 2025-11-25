@@ -5,10 +5,16 @@ It uses parallel Gymnasium environments, stable-baselines3, and a custom reward 
 penalizes lane deviation, heading error, and aggressive steering.
 
 ## How to run
-
 1. Install dependencies:
 ```bash
 pip install gymnasium==0.29.1 stable-baselines3==2.3.2 matplotlib numpy
-
+```
+2. Run the program:
+```bash
 python main.py
+```
+
+
+
+
 
