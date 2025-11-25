@@ -59,7 +59,7 @@ The baseline is a standard DQN agent with the same 256-256 MLP policy, replay bu
 
 Experiment 
 
-
+This work investigates whether a Parallel DQN can learn a stable, reliable lane-keeping policy in a noisy, dynamically changing road environment. We seek to establish if parallel training enhances learning speed, policy stability, and generalization over a standard single-environment DQN. The present study also examines how well the agent maintains lane position, tracks the centerline, and generates smooth steering behavior. The robustness of the learned control strategy is assessed by testing the trained policy on unseen lane geometries. Overall, this research aims to confirm that DeepLane offers safe and efficient autonomous lane-keeping viable for real-world deployment.
 
 
 <img width="687" height="539" alt="image" src="https://github.com/user-attachments/assets/bd452934-8124-41f5-8d32-f93fa2f6b9f6" />
