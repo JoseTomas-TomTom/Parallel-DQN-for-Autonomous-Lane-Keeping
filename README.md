@@ -1,5 +1,3 @@
-
-
 # DeepLane: Parallel DQN for Autonomous Lane Keeping
 1. Introduction:
 
@@ -7,8 +5,22 @@ Lane-keeping, a crucial skill for self-driving cars, requires precise control, a
 
 2. Parallel Deep Q-network (DQN)
 
-We developed a method called DeepLane that treats lane keeping as a decision-making problem. We solve this problem using a parallel Deep Q-Network (DQN). 
-The custom LaneKeepingEnv simulates how a vehicle moves sideways while it drives at a steady speed, using specific steering commands. 
+To understand a Parallel Deep Q-network, we first start with a Deep Q-network. 
+A DQN is a type of reinforcement learning that mixes Q-learning with deep neural networks to estimate the Q-value function. 
+The neural network makes predictions instead of relying on a Q-table. Q(s, a) shows the expected long-term benefit of choosing action a when in state s. 
+The aim is to discover the best action for each situation so that the agent can increase its total rewards over time.
+A Parallel DQN builds on this concept by operating multiple environments simultaneously. "Every environment creates sets of experiences." 
+
+(s,a,r,s′)
+
+All these experiences are kept in a shared replay buffer. 
+This allows the learner to train the Q-network with a large, varied, and less related group of samples. This results in quicker training, improved exploration, and more reliable learning than a DQN that only works in one environment.
+
+We created a method named DeepLane that treats lane keeping as a decision-making challenge using reinforcement learning. 
+DeepLane uses a Parallel Deep Q-Network to figure out how to keep the car in the middle of the lane while driving at a constant speed.
+Our custom LaneKeepingEnv simulates how a vehicle moves side to side within its lane and reacts to specific steering instructions. 
+By using a parallel DQN, DeepLane can collect different driving experiences from various simulated environments. 
+This approach speeds up training, makes it more stable, and helps the system perform better overall compared to using just one environment with a DQN.
 
 The input to the network is a 5-dimensional state vector: 
 
@@ -53,9 +65,7 @@ The loss encourages the network to match its predictions to a stable TD target.
 Experience replay (buffer of 300,000 transitions) is used to decorrelate samples.
 This loss function allows DeepLane to learn long-term lane-keeping behavior.
 
-5. Baseline Architecture Details
 
-The baseline is a standard DQN agent with the same 256-256 MLP policy, replay buffer size and batch size as DeepLane but trained with a single environment, without VecNormalize and without the curvature curriculum. This will isolate the effect of parallel training and normalization.
 
 Experiment 
 
