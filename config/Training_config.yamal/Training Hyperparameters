@@ -1,0 +1,24 @@
+# Training Run Hyperparameters
+
+total_timesteps: 400000              # number of training environment steps
+
+vec_normalization:
+  clip_obs: 10.0
+  normalize_obs: true
+  normalize_reward: false
+
+evaluation:
+  eval_every_steps: 1250             # 10,000 / 8 envs
+  n_eval_episodes: 5
+  deterministic: true
+
+checkpoints:
+  save_every_steps: 6250             # 50,000 / 8 envs
+  save_path: ./logs_dqn/
+
+model_save_path: dqn_lane_keep       # final saved model name
+
+testing_setup:
+  fixed_seed: 42
+  deterministic_test_env: make_test_env
+  model_selection: best_model.zip or dqn_lane_keep
