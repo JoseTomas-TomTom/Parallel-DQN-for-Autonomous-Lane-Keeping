@@ -1,1 +1,33 @@
+# DQN Algorithm Hyperparameters
+
+policy_network:
+  architecture: [256, 256]          # Two hidden layers with 256 units each
+
+learning_rate:
+  initial: 0.0003                   # LR starts at 3e-4
+  schedule: linear_decay            # decays to 0 as training progresses
+
+gamma: 0.99                          # discount factor
+
+replay_buffer:
+  size: 300000                       # replay memory capacity
+
+batch_size: 256                      # minibatch size for updates
+learning_starts: 10000               # steps before training begins
+
+train_frequency:
+  every_n_steps: 4                   # update every 4 environment steps
+
+gradient_steps: 1                    # one gradient update per training step
+
+target_network:
+  update_interval: 8000              # hard target update interval
+  tau: 0.005                         # Polyak averaging coefficient
+
+exploration:
+  initial_eps: 1.0                   # start fully random
+  final_eps: 0.02                    # minimal exploration after decay
+  fraction_of_training: 0.35         # decay ε over first 35% of training
+
+parallel_envs: 8                     # number of parallel environments
 
