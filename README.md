@@ -36,7 +36,8 @@ where
 - k(·) is the lane curvature,
 - d_preview = 15 m is a preview distance.
 
-The curvature terms k(x_t) and k(x_t + d_preview) are not used directly in the vehicle dynamics; instead, they are provided as “preview features” so the agent can anticipate upcoming bends in the road.
+Although curvature values are included in the observation, the current implementation uses a straight lane; curvature is provided only as a noisy preview feature rather than modifying the lane geometry.
+
 
 The network output is a discrete steering action δ_t selected from 15 uniformly spaced values in the range [−0.25, 0.25] rad. 
 A simple safety layer clamps and rate-limits the steering command so that |δ_t| ≤ 0.25 rad and |δ_t − δ_{t−1}| ≤ 0.5 rad/s, which keeps the policy within physically reasonable bounds.
@@ -89,8 +90,8 @@ This loss function allows DeepLane to learn long-term lane-keeping behavior.
 5. Training setup
 
 DeepLane is trained using a Parallel DQN, which runs in 8 different environments at the same time. Each `SubprocVecEnv` runs its own version of the custom `LaneKeepingEnv`. 
-The vehicle travels at a steady speed of 15 meters per second, and the time step is zero. 
-The wheelbase measures 2.05 meters. Seven meters. 
+The vehicle travels at a constant speed of 15 m/s with a simulation time step of Δt = 0.05 s.
+The wheelbase is 2.7 m, matching the parameters used in the LaneKeepingEnv dynamics.
 We use `VecNormalize` to adjust our observations while still keeping the original rewards.
 
 Key DQN hyperparameters:
