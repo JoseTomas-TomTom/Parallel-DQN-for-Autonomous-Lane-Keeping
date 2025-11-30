@@ -4996,7 +4996,7 @@ Episode length: 600.00 +/- 0.00
 |    loss             | 0.000891 |
 |    n_updates        | 12187    |
 ----------------------------------
-New best mean reward!
+
 Eval mean reward: 462.189 ± 216.914
 Metrics: {'center_rmse': 0.30173367261886597, 'pct_in_lane': 1.0}
 
