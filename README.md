@@ -85,9 +85,28 @@ ytarget​=rt​+γa′max​Qθ−​(st+1​,a′)
 The loss encourages the network to match its predictions to a stable TD target.
 Experience replay (buffer of 300,000 transitions) is used to decorrelate samples.
 This loss function allows DeepLane to learn long-term lane-keeping behavior.
-5 Training setup
 
+5. Training setup
 
+DeepLane is trained using a Parallel DQN, which runs in 8 different environments at the same time. Each `SubprocVecEnv` runs its own version of the custom `LaneKeepingEnv`. 
+The vehicle travels at a steady speed of 15 meters per second, and the time step is zero. 
+The wheelbase measures 2.05 meters. Seven meters. 
+We use `VecNormalize` to adjust our observations while still keeping the original rewards.
+
+Key DQN hyperparameters:
+
+- Network architecture: MLP with hidden layers [256, 256] and ReLU activations,
+- Discount factor: γ = 0.99,
+- Replay buffer size: 300,000 transitions (shared by all environments),
+- Batch size: 256,
+- Learning rate: linearly decayed from 3e−4 to 0 over training,
+- Target network update interval: 8,000 environment steps,
+- Exploration: ε decayed from 1.0 to 0.02 over 35% of training,
+- Total training steps: 400,000 environment steps.
+
+Sampling from eight different environments at the same time boosts the variety of experiences. 
+The replay buffer improves learning speed and stability when compared to using a single environment in DQN.
+ 
 6. Experiment 
 
 This work investigates whether a Parallel DQN can learn a stable, reliable lane-keeping policy in a noisy, dynamically changing road environment. We seek to establish if parallel training enhances learning speed, policy stability, and generalization over a standard single-environment DQN. The present study also examines how well the agent maintains lane position, tracks the centerline, and generates smooth steering behavior. The robustness of the learned control strategy is assessed by testing the trained policy on unseen lane geometries. Overall, this research aims to confirm that DeepLane offers safe and efficient autonomous lane-keeping viable for real-world deployment.
@@ -106,5 +125,30 @@ The figure below shows one representative evaluation rollout:
 
 <img width="687" height="539" alt="image" src="https://github.com/user-attachments/assets/bd452934-8124-41f5-8d32-f93fa2f6b9f6" />
 
+
+Trajectory Plot (Top graph)
+- This graph displays the vehicle's lateral position 𝑦𝑡 over time:
+- The lane center is shown by the dashed line at 𝑦=0.
+- The red dotted lines show the lane limits at 𝑦=±1.8 m.
+- The blue curve depicts the vehicle's route throughout the episode.
+- The vehicle's ultimate position is displayed by the orange triangle.
+
+Interpretation
+- The agent starts with a little offset.
+- It rapidly centers itself, demonstrating the effective correction of heading and lateral inaccuracy by the learnt controller.
+- The agent never exceeds the lane borders during the full 600-step rollout.
+- When the controller makes small heading adjustments, the trajectory stays steady but exhibits slight oscillations.
+
+This demonstrates that the policy learned by Parallel DQN maintains safe lane-keeping performance under noise.
+
+Steering Command Plot (bottom Graph)
+- The steering angle 𝛿𝑡 is displayed on the bottom graph: There are fifteen distinct ways to steer.
+- A safety layer prevents sudden changes by enforcing a rate restriction of 0.5 rad/s.
+Interpretation 
+- While the agent corrects the first lateral mistake, steering adjustments are more significant early in the episode.
+- The agent uses tiny, regulated oscillations to stay on track after stabilizing.
+- As the run comes to a close, noise and shifting curvature cause the oscillations to significantly increase, but the rate limiter maintains the motion's smoothness and physical realism.
+
+These steering patterns verify that the safety layer and incentive structure effectively encourage smooth control, not only low lane error.
 
 
