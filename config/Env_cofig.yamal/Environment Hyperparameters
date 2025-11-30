@@ -1,0 +1,41 @@
+# Lane-Keeping Environment Hyperparameters
+
+vehicle_dynamics:
+  dt: 0.05                           # time step (s)
+  velocity: 15.0                     # car speed (m/s)
+  wheelbase: 2.7                     # wheelbase length (m)
+  max_steering: 0.25                 # steering angle limit (rad)
+  lane_half_width: 1.8               # half lane width (m)
+  max_steps: 600                     # episode length cap
+
+action_space:
+  n_actions: 15                      # discrete steering positions
+
+lane_curvature:
+  amplitude_range: [0.0, 0.005]      # training amplitude range
+  frequency_range: [0.0005, 0.002]   # cycles per meter
+  curriculum:
+    max_amp_at_1M_steps: 0.008       # amplitude increases with training steps
+
+noise:
+  lateral_noise_std: 0.005           # measurement noise (m)
+  heading_noise_std: 0.001           # measurement noise (rad)
+
+preview:
+  distance: 15.0                     # preview distance for curvature (m)
+
+reward_weights:
+  lambda_y: 0.8
+  lambda_psi: 0.25
+  lambda_ydot: 0.08
+  lambda_delta: 0.002
+  lambda_dchange: 0.05
+
+boundary_penalty:
+  margin: 0.3                        # margin before applying penalty
+  penalty_max: 0.5                   # max penalty when crossing margin
+
+test_environment:
+  random_lane: false                 # deterministic testing
+  random_noise: false                # noise disabled during evaluation
+
