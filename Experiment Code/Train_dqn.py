@@ -1,49 +1,30 @@
-# train_dqn.py
 import os
-import numpy as np
-
 from stable_baselines3 import DQN
-from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv, VecNormalize
 from stable_baselines3.common.callbacks import EvalCallback, CheckpointCallback
 from stable_baselines3.common.evaluation import evaluate_policy
 
-from lane_keeping_env import LaneKeepingEnv
-
-
-def make_env(seed_offset=0):
-    def _init():
-        env = LaneKeepingEnv()
-        env = Monitor(env)
-        env.reset(seed=seed_offset)
-        return env
-    return _init
+from lane_keeping_env import make_env
 
 
 def lr_schedule(progress_remaining: float) -> float:
-    # same as notebook: linear decay from 3e-4 → 0
+    """Linear learning-rate decay."""
     return 3e-4 * progress_remaining
 
 
 def main():
     N_ENVS = 8
 
-    # Training env (parallel)
+    # ===== Vec envs =====
     train_env = SubprocVecEnv([make_env(i) for i in range(N_ENVS)])
     train_env = VecNormalize(train_env, norm_obs=True, norm_reward=False, clip_obs=10.0)
 
-    # Eval env (dummy vec)
+    # Eval env during training (still random; for robustness stats)
     eval_env = DummyVecEnv([make_env(10_000)])
-    eval_env = VecNormalize(
-        eval_env,
-        training=False,
-        norm_obs=True,
-        norm_reward=False,
-        clip_obs=10.0,
-    )
+    eval_env = VecNormalize(eval_env, training=False, norm_obs=True, norm_reward=False, clip_obs=10.0)
     eval_env.obs_rms = train_env.obs_rms
 
-    # Callbacks
+    # ===== Callbacks =====
     eval_callback = EvalCallback(
         eval_env,
         best_model_save_path="./logs_dqn/",
@@ -52,13 +33,13 @@ def main():
         deterministic=True,
         render=False,
     )
-
     ckpt_callback = CheckpointCallback(
         save_freq=50_000 // N_ENVS,
         save_path="./logs_dqn/",
         name_prefix="dqn_lane",
     )
 
+    # ===== DQN config =====
     policy_kwargs = dict(net_arch=[256, 256])
 
     model = DQN(
@@ -81,14 +62,15 @@ def main():
         tensorboard_log="./tb_dqn/",
     )
 
+    # ===== Train =====
     TIMESTEPS = 400_000
     model.learn(total_timesteps=TIMESTEPS, callback=[eval_callback, ckpt_callback])
 
-    # Save base model + VecNormalize stats
+    # Save model + normalization
     model.save("dqn_lane_keep")
     train_env.save("vecnormalize_train.pkl")
 
-    # Proper eval (same as notebook)
+    # Quick evaluation on random eval env
     eval_env = DummyVecEnv([make_env(42)])
     eval_env = VecNormalize.load("vecnormalize_train.pkl", eval_env)
     eval_env.training = False
@@ -96,10 +78,10 @@ def main():
 
     best_path = "./logs_dqn/best_model.zip"
     model_path = best_path if os.path.exists(best_path) else "dqn_lane_keep"
-
     model = DQN.load(model_path, env=eval_env)
+
     mean_r, std_r = evaluate_policy(model, eval_env, n_eval_episodes=5, deterministic=True)
-    print(f"Eval mean reward: {mean_r:.3f} ± {std_r:.3f}")
+    print(f"Eval mean reward (random lanes): {mean_r:.3f} ± {std_r:.3f}")
 
 
 if __name__ == "__main__":
