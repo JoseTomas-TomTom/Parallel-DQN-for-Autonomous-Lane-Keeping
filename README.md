@@ -120,7 +120,7 @@ simple metrics:
 **Lane retention**: percentage of time steps with |y_t| ≤ 1.8 m.
 
 
-Even in the face of sensor noise and randomized curvature characteristics, the parallel DQN strategy often achieves low lateral RMSE and remains inside the lane borders for the whole 30-second episodes.
+Even in the face of sensor noise and randomized curvature characteristics, the parallel DQN strategy often achieves low lateral RMSE and remains inside the lane boundaries for the entire 30-second episodes.
 The figure below shows one representative evaluation rollout:
 
 
@@ -143,7 +143,7 @@ Interpretation
 This demonstrates that the policy learned by Parallel DQN maintains safe lane-keeping performance under noise.
 
 Steering Command Plot (bottom Graph)
-- The steering angle 𝛿𝑡 is displayed on the bottom graph: There are fifteen distinct ways to steer.
+- The steering angle 𝛿𝑡 is displayed on the bottom graph: Although 15 discrete steering actions exist, the safety layer rate-limits changes in δ_t, producing smoother real-world steering behavior.
 - A safety layer prevents sudden changes by enforcing a rate restriction of 0.5 rad/s.
 Interpretation 
 - While the agent corrects the first lateral mistake, steering adjustments are more significant early in the episode.
